@@ -7,47 +7,83 @@ class App extends Component {
   //state is a property only in component possible
   state= {
     persons:[
-      {name:'Max', age:28},
-      {name:'Manu', age:29},
-      {name:'Mike', age:30}
+      {id:'asf1',name:'Max', age:28},
+      {id:'vasdf1',name:'Manu', age:29},
+      {id:'yqi12',name:'Mike', age:30}
     ],
-    otherState:'some other value'
+    otherState:'some other value',
+    showPerson:false
   };
 
-  switchNameHandler =(newName)=>{
-    console.log('Was clicked!');
-    //Don't do this this.state.persons[0].name='Maxiimilan';
-    //it completely replace so no otherState property on click
-    this.setState({persons:[
-      {name:newName, age:28},
-      {name:'Manu', age:29},
-      {name:'Mike', age:40},
-    ]});
-  };
+  nameChangeHandler=(event,id)=>{
+    const personIndex=this.state.persons.findIndex(p=>{
+      return p.id===id;
+    })
 
-  nameChangeHandler=(event)=>{
-    this.setState({persons:[
-      {name:'Max', age:28},
-      {name:event.target.value, age:29},
-      {name:'Mike', age:30},
-    ]});
+    const person={
+      ...this.state.persons[personIndex]
+    };
+    console.log(person);
+    person.name=event.target.value;
+
+    const persons=[...this.state.persons];
+    persons[personIndex]=person;
+
+    this.setState({persons:persons});
   }
 
+  deletePersonHandler=(personIndex)=>{
+    //const persons=this.state.persons.slice();
+    const persons=[...this.state.persons];
+    persons.splice(personIndex,1);
+    this.setState({persons:persons});
+  }
+
+  // //this would create a problem
+  // togglePersonHandler(){
+  // }
+  togglePersonHandler=()=>{
+    const doesShow=this.state.showPerson;
+    this.setState({showPerson:!doesShow})
+  }
 
   //don't add parenthesis
   //just pass reference
+  //ternary operations instead of directive
   render() {
+    const style={
+      backgroundColor:'white',
+      font:'inherit',
+      border:'1px solid blue',
+      padding:'8px',
+      cursor:'pointer'
+    };
+
+    let persons=null;
+
+    if(this.state.showPerson){
+      persons=(
+        <div>
+          {this.state.persons.map((person,index)=>{
+            return <Person 
+              click={()=>this.deletePersonHandler(index)} 
+              name={person.name} 
+              age={person.age}
+              key={person.id}
+              changed={(event)=>this.nameChangeHandler(event,person.id)}/>  
+          })}
+        
+        </div>
+      );
+    }
+      
     return (
       <div className="App">
         <h1>Hi I'm a React App</h1>
-        <button onClick={ ()=> this.switchNameHandler('Maximilian!!')}>Switch Name</button>
-        <Person name={this.state.persons[0].name} age={this.state.persons[0].age}/>
-        <Person name={this.state.persons[1].name} 
-                age={this.state.persons[1].age}
-                click={this.switchNameHandler.bind(this,'Max!')}
-                changed={this.nameChangeHandler}>
-                My hobbies is Racing</Person>
-        <Person name={this.state.persons[2].name} age={this.state.persons[2].age}/>
+        <button 
+          style={style}
+          onClick={this.togglePersonHandler}>Toggler</button>
+        {persons}
       </div>
     );
     //we can also pass method also as props, so we can change state in another component
@@ -57,5 +93,6 @@ class App extends Component {
   }
 }
 
-
 export default App;
+
+
